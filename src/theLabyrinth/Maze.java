@@ -8,59 +8,59 @@ class Maze {
 	
 	char[][] currentMap;
 	int distances [][][][];
-	int R;
-	int C;
+	int R = -1;
+	int C = -1;
+	int controllerR = -1;
+	int controllerC = -1;
+	int transporterR = -1;
+	int transporterC = -1;
+		
 	
-	private int getR() {
-		return R;
-	}
-	
-	private int getC() {
-		return C;
-	}
-	
-	public Maze(Scanner in) {
-		R = Player.R;
-		C = Player.C;
-		currentMap = new char[getR()][getC()];
-		for(int r = 0; r < getR(); r++) {
+	public Maze(Scanner in, int R, int C) {
+		this.R = R;
+		this.C = C;
+		currentMap = new char[R][C];
+		for(int r = 0; r < R; r++) {
 			String mazeLine = in.nextLine();
-			for(int c = 0; c < getC(); c++)
+			for(int c = 0; c < C; c++)
 				currentMap[r][c] = mazeLine.charAt(c);
 		}
-		distances = new int[getR()][getC()][getR()][getC()];
+		distances = new int[R][C][R][C];
 		initializeDistances();
 	}
-
+	
 	public Maze(Maze oldMaze) {
 		this.R = oldMaze.R;
 		this.C = oldMaze.C;
-		this.currentMap = new char[getR()][getC()];
-		for(int row = 0; row < getR(); row++)
-			for(int col = 0; col < getC(); col++)
+		this.controllerC = oldMaze.controllerC;
+		this.controllerR = oldMaze.controllerR;
+		this.transporterC = oldMaze.transporterC;
+		this.currentMap = new char[R][C];
+		for(int row = 0; row < R; row++)
+			for(int col = 0; col < C; col++)
 				this.currentMap[row][col] = oldMaze.currentMap[row][col];
-		distances = new int[getR()][getC()][getR()][getC()];
+		distances = new int[R][C][R][C];
 		initializeDistances();
 	}
 
 	private void initializeDistances() {
-		for(int i = 0; i < getR(); i++)
-			for(int j = 0; j < getC(); j++)
-				for(int k = 0; k < getR(); k++)
-					for(int l = 0; l < getC(); l++)
+		for(int i = 0; i < R; i++)
+			for(int j = 0; j < C; j++)
+				for(int k = 0; k < R; k++)
+					for(int l = 0; l < C; l++)
 						distances[i][j][k][l] = maxDistance;
 
-		for(int i = 0; i < getR(); i++)
-			for (int j = 0; j < getC(); j++)
+		for(int i = 0; i < R; i++)
+			for (int j = 0; j < C; j++)
 				distances[i][j][i][j] = 0;
 	}
 	
-	public void calculateDistances() {
+	void calculateDistances() {
 		boolean changes = true;
 		while (changes) {
 			changes = false;
-			for(int row = 0; row < getR(); row++)
-				for(int col = 0; col < getC(); col++)
+			for(int row = 0; row < R; row++)
+				for(int col = 0; col < C; col++)
 					if(currentMap[row][col] != '#')
 						changes = takeShortcut(row, col) || changes;
 		}
@@ -70,11 +70,11 @@ class Maze {
 		boolean returnme = false;
 		if (row != 0)
 			returnme = returnme || takeShortcutAux(row, col, -1, 0);
-		if (row != getR() - 1)
+		if (row != R - 1)
 			returnme = returnme || takeShortcutAux(row, col, 1, 0);
 		if (col != 0)
 			returnme = returnme || takeShortcutAux(row, col, 0, -1);			
-		if (col != getC() - 1)
+		if (col != C - 1)
 			returnme = returnme || takeShortcutAux(row, col, 0, 1);
 		return returnme;
 	}
@@ -82,8 +82,8 @@ class Maze {
 	private boolean takeShortcutAux(int row, int col, int rowChange, int colChange) {
 		boolean returnme = false;
 		if (currentMap[row+rowChange][col+colChange] != '#')
-			for(int i = 0; i < getR(); i++)
-				for(int j = 0; j < getC(); j++) {
+			for(int i = 0; i < R; i++)
+				for(int j = 0; j < C; j++) {
 					int newPath = 1+distances[row+rowChange][col+colChange][i][j];
 					if(distances[row][col][i][j]> newPath) {
 						distances[row][col][i][j] = newPath;
@@ -94,65 +94,65 @@ class Maze {
 		return returnme;
 	}
 
-	public void replaceCells(char from, char to) {
-		for(int row = 0; row < getR(); row++)
-			for(int col = 0; col < getC(); col++)
+	void replaceCells(char from, char to) {
+		for(int row = 0; row < R; row++)
+			for(int col = 0; col < C; col++)
 				if(currentMap[row][col] == from)
 					currentMap[row][col] = to;
 	}
 
-	public String getDirection(int startRow, int startCol, int endRow, int endCol) {
+	String getDirection(int startRow, int startCol, int endRow, int endCol) {
 		if(startCol != 0 && distances[startRow][startCol][endRow][endCol] == 1+ distances[startRow][startCol+1][endRow][endCol])
 			return "RIGHT";
-		if(startCol != getC() - 1 && distances[startRow][startCol][endRow][endCol] == 1+ distances[startRow][startCol-1][endRow][endCol])
+		if(startCol != C - 1 && distances[startRow][startCol][endRow][endCol] == 1+ distances[startRow][startCol-1][endRow][endCol])
 			return "LEFT";
 		if(startRow != 0 && distances[startRow][startCol][endRow][endCol] == 1+ distances[startRow-1][startCol][endRow][endCol])
 			return "UP";
-		if(startRow != getR() - 1 && distances[startRow][startCol][endRow][endCol] == 1+ distances[startRow+1][startCol][endRow][endCol])
+		if(startRow != R - 1 && distances[startRow][startCol][endRow][endCol] == 1+ distances[startRow+1][startCol][endRow][endCol])
 			return "DOWN";
 		return "NONE";
 	}
 
-	public void findControler() {
-		for(int row = 0; row < getR(); row++) {
-			for(int col = 0; col < getC(); col++) {
+	void findControler() {
+		for(int row = 0; row < R; row++) {
+			for(int col = 0; col < C; col++) {
 				if(currentMap[row][col] == 'C') {
-					Player.controllerR = row;
-					Player.controllerC = col;
+					this.controllerR = row;
+					this.controllerC = col;
 					return;
 				}
 			}
 		}
 	}
 
-	public void findTransporter() {
-		for(int row = 0; row < getR(); row++) {
-			for(int col = 0; col < getC(); col++) {
+	void findTransporter() {
+		for(int row = 0; row < R; row++) {
+			for(int col = 0; col < C; col++) {
 				if(currentMap[row][col] == 'T') {
-					Player.transporterR = row;
-					Player.transporterC = col;
+					this.transporterR = row;
+					this.transporterC = col;
 					return;
 				}
 			}
 		}	
 	}
 
-	public boolean isExplorationPoint(int row, int col, char target) {
+	boolean isExplorationPoint(int row, int col, char target) {
 		if(currentMap[row][col] == '.')
 			for(int rowChange = -2; rowChange <= 2; rowChange++)
-				if(row + rowChange >=0 && row + rowChange < getR())
+				if(row + rowChange >=0 && row + rowChange < R)
 					for(int colChange = -2; colChange <= 2; colChange++)
-						if(col + colChange >= 0 && col + colChange < getC())
+						if(col + colChange >= 0 && col + colChange < C)
 							if(currentMap[row+rowChange][col+colChange] == target)
 								return true;
 		return false;
 	}
 	
-	public int[] closeExplorationPoint(int startRow, int startCol, char target) {
+	int[] closeExplorationPoint(int startRow, int startCol, char target) {
 		int[] explorationPoint = new int[] {-1,-1};
 		int shortestDistance = Maze.maxDistance;
-		for(int row = 0; row < getR(); row++) {
-			for(int col = 0; col < getC(); col++) {
+		for(int row = 0; row < R; row++) {
+			for(int col = 0; col < C; col++) {
 				if(isExplorationPoint(row,col,target) 
 						&& distances[startRow][startCol][row][col] < shortestDistance) {
 					explorationPoint[0] = row;
@@ -164,11 +164,11 @@ class Maze {
 		return explorationPoint;
 	}
 
-	public void markPath() {
-		int pointerRow = Player.controllerR;
-		int pointerCol = Player.controllerC;
-		while(pointerRow != Player.transporterR || pointerCol != Player.transporterC) {
-			String direction = getDirection(pointerRow,pointerCol,Player.transporterR,Player.transporterC);
+	void markPath() {
+		int pointerRow = controllerR;
+		int pointerCol = controllerC;
+		while(pointerRow != transporterR || pointerCol != transporterC) {
+			String direction = getDirection(pointerRow,pointerCol,transporterR,transporterC);
 			switch(direction) {
 				case "LEFT": pointerCol++;
 					break;
