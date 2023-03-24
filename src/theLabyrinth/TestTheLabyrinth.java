@@ -21,7 +21,7 @@ class TestTheLabyrinth {
 			Player.R = fileIn.nextInt();
 			Player.C = fileIn.nextInt();
 			fileIn.nextLine();
-			Player.currentMaze = new Maze(fileIn);
+			newPlayer.currentMaze = new Maze(fileIn);
 		} catch (FileNotFoundException e) {
 			fail(e.toString());
 		}

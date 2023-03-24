@@ -8,7 +8,7 @@ public class Player {
 	static int controllerC = -1;
 	static int transporterR = -1;
 	static int transporterC = -1;
-	static Maze currentMaze;
+	Maze currentMaze;
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
