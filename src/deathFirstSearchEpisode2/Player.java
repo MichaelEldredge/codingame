@@ -1,5 +1,6 @@
 package deathFirstSearchEpisode2;
 
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,17 +39,14 @@ class Player {
         }
         System.err.println();
         System.err.println();
-
+        mge.findDegreeTwoNodes();
         // game loop
         while (true) {
             mge.bob = in.nextInt(); // The index of the node on which the Bobnet agent is positioned this turn
             System.err.println(mge.bob);
-            // Write an action using System.out.println()
-            // To debug: System.err.println("Debug messages...");
-
-
-            // Example: 3 4 are the indices of the nodes you wish to sever the link between
-            System.out.println("3 4");
+            int currentPriority = mge.priorityNode();
+            int gatewayNode = mge.adjacentGateway(currentPriority);
+            mge.sever(currentPriority, gatewayNode);
         }
     }
 
@@ -89,7 +87,16 @@ class Player {
 			return this.bob;			
 		}
 		if(!this.degreeTwoNodes.isEmpty()) {
-			return this.degreeTwoNodes.first();
+			int[] distances = this.distancesToBob();
+			int closestDegreeTwoNode = this.degreeTwoNodes.first();
+			int closestDistance = distances[closestDegreeTwoNode];
+			for(int node : this.degreeTwoNodes) {
+				if(distances[node] < closestDistance) {
+					closestDegreeTwoNode = node;
+					closestDistance = distances[node];
+				}
+			}
+			return closestDegreeTwoNode;
 		}
 		for(int i = 0; i < this.N; i++) {
 			if(this.adjacentGateway(i) != -1) {
@@ -99,5 +106,30 @@ class Player {
 		return -1;
 	}
 
+	int edgeDistance(int start, int end) {
+		if(edges[start][end] == 0)
+			return N;
+		return (this.adjacentGateway(end) == -1)?1:0;
+	}
+
+	int[] distancesToBob() {
+		// This has worst case time complexity of O(N^3).
+		int[] distances = new int[this.N];
+		Arrays.fill(distances, this.N);
+		distances[this.bob] = 0;
+		boolean changes = true;
+		while(changes) {
+			changes = false;
+			for(int i = 0; i < this.N; i++) {
+				for(int j = 0; j < this.N; j++) {
+					if(distances[i] > distances[j] + this.edgeDistance(j, i)) {
+						distances[i] = distances[j] + this.edgeDistance(j, i);
+						changes = true;
+					}
+				}
+			}
+		}
+		return distances;
+	}
 
 }

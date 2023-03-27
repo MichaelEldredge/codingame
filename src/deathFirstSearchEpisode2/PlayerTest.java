@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -47,7 +48,7 @@ class PlayerTest {
 	
 	private Player loadState(String filename) {
 		Player tester = new Player();
-		File setup = new File("C:\\trg_demos\\CodingGame\\src\\theLabyrinth\\" + filename);
+		File setup = new File("C:\\trg_demos\\CodingGame\\src\\deathFirstSearchEpisode2\\" + filename);
 		try (Scanner in = new Scanner (setup)) {
 			tester.N = in.nextInt(); // the total number of nodes in the level, including the gateways
 			tester.L = in.nextInt(); // the number of links
@@ -141,5 +142,30 @@ class PlayerTest {
 		tester.findDegreeTwoNodes();
 		
 		assertEquals(0,tester.priorityNode());
+	}
+	
+	@Test
+	public void shouldPickCloserDegreeTwoNode() {
+		Player tester = loadState("strategicPriority.txt");
+		tester.findDegreeTwoNodes();
+		
+		assertEquals(5,tester.priorityNode());
+	}
+	
+	@Test
+	public void shouldGiveDistancesBetweenEdges() {
+		Player tester = loadState("distanceTesting.txt");
+		
+		assertEquals(0,tester.edgeDistance(0,1));
+		assertEquals(1,tester.edgeDistance(1,0));
+		assertTrue(tester.edgeDistance(0,3) >= 6);
+	}
+	
+	@Test
+	public void shouldGiveDistancesToBob() {
+		Player tester = loadState("distanceTesting.txt");
+		int[] distances = tester.distancesToBob();
+		int[] targetDistances = {0,0,distances[2],1,1,2};
+		assertTrue(Arrays.equals(targetDistances,distances));
 	}
 }
